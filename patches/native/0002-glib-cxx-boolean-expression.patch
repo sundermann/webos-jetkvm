@@ -1,0 +1,15 @@
+diff --git a/glib/gmacros.h b/glib/gmacros.h
+--- a/glib/gmacros.h
++++ b/glib/gmacros.h
+@@ -1280,7 +1280,11 @@
+       G_PASTE (_g_boolean_var_, uniq) = 1;      \
+    G_PASTE (_g_boolean_var_, uniq);             \
+ })
++#ifdef __cplusplus
++#define _G_BOOLEAN_EXPR(expr) ([&] { if (expr) return 1; return 0; } ())
++#else
+ #define _G_BOOLEAN_EXPR(expr) _G_BOOLEAN_EXPR_IMPL (__COUNTER__, expr)
++#endif
+ #define G_LIKELY(expr) (__builtin_expect (_G_BOOLEAN_EXPR(expr), 1))
+ #define G_UNLIKELY(expr) (__builtin_expect (_G_BOOLEAN_EXPR(expr), 0))
+ #else

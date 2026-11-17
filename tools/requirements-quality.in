@@ -1,0 +1,6 @@
+clang-format==23.1.5
+clang-tidy==23.1.4
+ruff==0.17.5
+gersemi==0.29.2
+shellcheck-py==0.11.0.1
+shfmt-py==4.2.0

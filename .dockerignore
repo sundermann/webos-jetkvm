@@ -1,0 +1,8 @@
+.git
+build
+dist
+research
+node_modules
+**/node_modules
+**/dist
+**/localization/paraglide

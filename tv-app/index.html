@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>webOS JetKVM</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <main>
+      <header>
+        <img src="icon.png" alt="" />
+        <div>
+          <h1>webOS JetKVM</h1>
+          <p id="video-format">Hardware H.264</p>
+        </div>
+        <span id="state">Loading…</span>
+      </header>
+      <section class="address">
+        <h2>Open in Firefox</h2>
+        <div id="urls">http://&lt;TV IP&gt;:47990/</div>
+        <p>Username: <strong>jetkvm</strong> · use the password saved below</p>
+      </section>
+      <section class="controls">
+        <label for="password">Browser password</label
+        ><input
+          id="password"
+          type="password"
+          maxlength="1024"
+          autocomplete="new-password"
+          placeholder="Enter a password"
+        /><small id="password-hint">Set a password to enable browser access.</small>
+        <label for="resolution">Video resolution</label
+        ><select id="resolution" aria-label="Video resolution"></select>
+        <small>Use ←/→ to choose a preset, then Save settings.</small>
+        <label class="checkbox"
+          ><input id="autostart" type="checkbox" />Start automatically when the TV boots</label
+        >
+        <div class="buttons">
+          <button id="save">Save settings</button><button id="start">Start server</button
+          ><button id="stop">Stop server</button>
+        </div>
+      </section>
+      <p id="status" role="status">Connecting to the TV service…</p>
+      <footer>
+        Mouse control requires Audio Guidance to be off in the TV’s accessibility settings.
+      </footer>
+    </main>
+    <script src="webOSTV.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>

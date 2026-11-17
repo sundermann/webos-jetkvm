@@ -1,0 +1,13 @@
+{
+  "id": "org.webosbrew.jetkvm",
+  "version": "1.0.0",
+  "type": "web",
+  "vendor": "webOS Homebrew",
+  "main": "index.html",
+  "title": "webOS JetKVM",
+  "appDescription": "Hardware H.264 remote console for Firefox",
+  "icon": "icon.png",
+  "largeIcon": "largeIcon.png",
+  "iconColor": "#2563eb",
+  "disableBackHistoryAPI": true
+}

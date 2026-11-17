@@ -1,0 +1,12 @@
+{
+  "id": "org.webosbrew.jetkvm.service",
+  "description": "webOS JetKVM control service",
+  "engine": "native",
+  "executable": "webos-jetkvm-service",
+  "services": [
+    {
+      "name": "org.webosbrew.jetkvm.service",
+      "description": "webOS JetKVM control service"
+    }
+  ]
+}

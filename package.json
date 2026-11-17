@@ -1,0 +1,42 @@
+{
+  "name": "webos-jetkvm",
+  "version": "1.0.0",
+  "private": true,
+  "description": "JetKVM browser console with hardware H.264 capture for rooted LG webOS TVs",
+  "license": "GPL-2.0-only",
+  "scripts": {
+    "build": "npm run build:tv-app && npm run build:ui",
+    "build:tv-app": "node tools/build_tv_app.mjs",
+    "build:ui": "npm run prepare:ui && npm ci --prefix build/jetkvm/ui --ignore-scripts && npm run build:device --prefix build/jetkvm/ui && node tools/package_ui.mjs",
+    "build:native": "cmake -S . -B build/release -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=ON && cmake --build build/release --target stage-service --parallel",
+    "package": "ares-package -o dist/ -n build/package/app build/package/service",
+    "manifest": "node tools/build_manifest.mjs",
+    "compat-check": "webosbrew-ipk-compat-checker --markdown dist/${npm_package_config_appId}_${npm_package_version}_all.ipk",
+    "deploy": "ares-install dist/${npm_package_config_appId}_${npm_package_version}_all.ipk",
+    "launch": "ares-launch ${npm_package_config_appId}",
+    "prepare:ui": "node tools/prepare_jetkvm.mjs",
+    "refresh:ui-patch": "node tools/prepare_jetkvm.mjs --refresh",
+    "quality:setup": "python3 tools/quality.py setup",
+    "format": "npm run prepare:ui && python3 tools/quality.py format && npm run refresh:ui-patch",
+    "format:check": "npm run prepare:ui && python3 tools/quality.py check-format",
+    "lint": "npm run prepare:ui && python3 tools/quality.py lint",
+    "lint:native": "python3 tools/quality.py tidy --build-dir build/host",
+    "test:browser": "node tools/test_browser.mjs",
+    "check": "npm run format:check && npm run lint && npm run lint:native && ctest --test-dir build/host --output-on-failure"
+  },
+  "dependencies": {
+    "webostvjs": "^1.2.5"
+  },
+  "devDependencies": {
+    "@webosbrew/compat-checker": "^1.3.0",
+    "@webosose/ares-cli": "^2.2.0",
+    "oxfmt": "0.42.0",
+    "oxlint": "1.57.0",
+    "oxlint-tsgolint": "0.18.1",
+    "playwright": "1.65.1",
+    "typescript": "5.9.3"
+  },
+  "config": {
+    "appId": "org.webosbrew.jetkvm"
+  }
+}

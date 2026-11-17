@@ -1,0 +1,81 @@
+diff --git a/deps/libjuice/src/conn_mux.c b/deps/libjuice/src/conn_mux.c
+--- a/deps/libjuice/src/conn_mux.c
++++ b/deps/libjuice/src/conn_mux.c
+@@ -54,7 +54,6 @@
+ 
+ static conn_registry_t **conn_mux_registries;
+ static int conn_mux_registries_size;
+-static int conn_mux_registries_count;
+ 
+ conn_registry_t *conn_mux_get_registry(udp_socket_config_t *config) {
+ 	for (int i = 0; i < conn_mux_registries_size; i++) {
+@@ -101,7 +100,6 @@
+ 	}
+ 
+ 	conn_mux_registries[i] = registry;
+-	++conn_mux_registries_count;
+ 
+ 	registry_impl_t *impl = registry->impl;
+ 	impl->conn_mux_registries_index = i;
+@@ -287,6 +285,7 @@
+ 	JLOG_VERBOSE("Waiting for connections thread");
+ 	thread_join(registry_impl->thread, NULL);
+ 
++	assert(registry_impl->conn_mux_registries_index >= 0);
+ 	if (registry_impl->conn_mux_registries_index > -1) {
+ 		int i = registry_impl->conn_mux_registries_index;
+ 		assert(conn_mux_registries[i] == registry);
+@@ -294,8 +293,6 @@
+ 		registry_impl->conn_mux_registries_index = -1;
+ 	}
+ 
+-	assert(conn_mux_registries_count > 0);
+-	--conn_mux_registries_count;
+ 
+ 	mutex_destroy(&registry_impl->send_mutex);
+ 	closesocket(registry_impl->sock);
+diff --git a/deps/usrsctp/usrsctplib/netinet/sctp_usrreq.c b/deps/usrsctp/usrsctplib/netinet/sctp_usrreq.c
+--- a/deps/usrsctp/usrsctplib/netinet/sctp_usrreq.c
++++ b/deps/usrsctp/usrsctplib/netinet/sctp_usrreq.c
+@@ -5568,22 +5568,19 @@
+ 			break;
+ 		}
+ 		if (send_out) {
+-			int cnt;
+ 			uint16_t strm;
+ 			if (strrst->srs_number_streams) {
+-				for (i = 0, cnt = 0; i < strrst->srs_number_streams; i++) {
++				for (i = 0; i < strrst->srs_number_streams; i++) {
+ 					strm = strrst->srs_stream_list[i];
+ 					if (stcb->asoc.strmout[strm].state == SCTP_STREAM_OPEN) {
+ 						stcb->asoc.strmout[strm].state = SCTP_STREAM_RESET_PENDING;
+-						cnt++;
+ 					}
+ 				}
+ 			} else {
+ 				/* Its all */
+-				for (i = 0, cnt = 0; i < stcb->asoc.streamoutcnt; i++) {
++				for (i = 0; i < stcb->asoc.streamoutcnt; i++) {
+ 					if (stcb->asoc.strmout[i].state == SCTP_STREAM_OPEN) {
+ 						stcb->asoc.strmout[i].state = SCTP_STREAM_RESET_PENDING;
+-						cnt++;
+ 					}
+ 				}
+ 			}
+@@ -8512,8 +8509,6 @@
+ 	return (error);
+ }
+ 
+-static int sctp_defered_wakeup_cnt = 0;
+-
+ int
+ sctp_accept(struct socket *so, struct sockaddr **addr)
+ {
+@@ -8577,7 +8572,6 @@
+ 			inp->sctp_flags &= ~SCTP_PCB_FLAGS_WAKEINPUT;
+ 			SOCKBUF_LOCK(&inp->sctp_socket->so_rcv);
+ 			if (soreadable(inp->sctp_socket)) {
+-				sctp_defered_wakeup_cnt++;
+ #if defined(__Userspace__)
+ 				/*__Userspace__ calling sorwakup_locked because of SOCKBUF_LOCK above */
+ #endif

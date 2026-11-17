@@ -1,0 +1,119 @@
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  background: #0f172a;
+  color: #e2e8f0;
+  font:
+    26px Arial,
+    sans-serif;
+}
+main {
+  max-width: 1400px;
+  margin: 32px auto;
+  padding: 0 40px;
+}
+header {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  border-bottom: 1px solid #334155;
+  padding-bottom: 26px;
+}
+header img {
+  width: 88px;
+  height: 88px;
+}
+h1 {
+  margin: 0;
+  font-size: 44px;
+}
+header p,
+section p {
+  color: #94a3b8;
+  margin: 10px 0;
+}
+#state {
+  margin-left: auto;
+  color: #93c5fd;
+}
+.address {
+  margin: 30px 0;
+  padding: 24px 32px;
+  background: #1e293b;
+  border-radius: 14px;
+}
+h2 {
+  font-size: 24px;
+  margin: 0 0 12px;
+  color: #94a3b8;
+}
+#urls {
+  font-size: 40px;
+  color: #dbeafe;
+  line-height: 1.4;
+}
+.controls {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  max-width: 900px;
+}
+input[type="password"],
+select {
+  font: inherit;
+  padding: 15px;
+  border: 2px solid #475569;
+  border-radius: 8px;
+  background: #1e293b;
+  color: white;
+}
+small {
+  color: #94a3b8;
+  font-size: 22px;
+}
+.checkbox {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 15px 0;
+}
+.checkbox input {
+  width: 30px;
+  height: 30px;
+  accent-color: #2563eb;
+}
+.buttons {
+  display: flex;
+  gap: 16px;
+}
+button {
+  font: inherit;
+  font-weight: bold;
+  padding: 18px 26px;
+  background: #2563eb;
+  border: 3px solid transparent;
+  border-radius: 8px;
+  color: white;
+}
+button:disabled {
+  opacity: 0.4;
+}
+button:focus,
+input:focus,
+select:focus {
+  outline: 4px solid #93c5fd;
+  outline-offset: 4px;
+}
+#status {
+  min-height: 65px;
+  white-space: pre-wrap;
+  color: #bfdbfe;
+}
+footer {
+  border-top: 1px solid #334155;
+  padding-top: 22px;
+  color: #94a3b8;
+  font-size: 22px;
+}
