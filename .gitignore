@@ -53,6 +53,7 @@ dkms.conf
 
 build/
 dist/
+/.idea/
 # Local investigations, measurements and vendor reference binaries.
 /research/
 *.swp
