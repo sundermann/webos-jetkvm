@@ -19,8 +19,8 @@ of the runtime ABI. The current application bindings call functions only.
 Executing a dummy function traps. No vendor implementation or library binary is
 included here.
 
-`native/nyx.hpp` retains this project's existing ARM32 layouts and declares the
-proxy methods used by capture. C++ namespaces and parameter type names match the
+`native/nyx.hpp` declares the ARM32 types and proxy methods used by the optional
+`libwebos-jetkvm-nyx.so` capture module. C++ namespaces and parameter type names match the
 firmware ABI so the compiler produces the symbol references directly. Proxy
 objects remain owned by the TV library; they must not be constructed, copied,
 or deleted by this application. The input-manager call retains its existing
@@ -51,7 +51,8 @@ Unsupported export types and versioned definitions are rejected instead of
 silently omitted.
 
 Cross builds produce the stubs in `build/release/native/stubs/`. They are not
-installed or copied into `service/lib` or the IPK. Executables use `$ORIGIN/lib`
-for bundled runtime dependencies and resolve Nyx/input-manager from the TV's
-normal library search path. Do not add the stub directory to `LD_LIBRARY_PATH`
+installed or copied into `service/lib` or the IPK. The server loads the capture
+module from its bundled runtime library search path. The module and the server
+resolve Nyx and input-manager, respectively, from the TV's library search path.
+Do not add the stub directory to `LD_LIBRARY_PATH`
 or distribute these libraries as runtime implementations.

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "capture_backend.hpp"
+
 #include <array>
 #include <cstddef>
 #include <cstdint>
@@ -7,11 +9,9 @@
 #include <stdexcept>
 #include <string>
 
-// Existing retail TV ARM32 ABI declarations, now bound by the native linker.
+// Retail TV ARM32 ABI declarations, bound by the Nyx capture module.
 // Proxy objects are owned by Nyx. Only references cross this interface; their
 // implementation, object layout, and module selection remain in the TV library.
-enum nyx_error_t : int32_t;
-
 namespace nyx {
 namespace ScreenCapture_1_0 {
 struct Rect {
@@ -29,17 +29,7 @@ struct VideoWindowInfo {
 } // namespace ScreenCapture_1_0
 
 namespace Venc_1_0 {
-struct FrameInfo {
-    uint32_t port{};
-    uint8_t type = 0;
-    std::array<uint8_t, 3> padding{};
-    uint64_t timestamp{};
-    const uint8_t* base = nullptr;
-    uint32_t bytes{};
-};
-using EncoderCallback = nyx_error_t (*)(FrameInfo*);
-
-// Opaque foreign ABI enum. Project parameter IDs are declared separately below.
+// Opaque foreign ABI enums. Project parameter IDs are declared in capture_backend.hpp.
 enum class ParamType : uint32_t;
 enum class InputType : uint32_t;
 } // namespace Venc_1_0
@@ -64,7 +54,7 @@ class VencProxy {
     nyx_error_t close();
     nyx_error_t connect(unsigned port, Venc_1_0::InputType input);
     nyx_error_t setParam(unsigned port, Venc_1_0::ParamType parameter, int value);
-    nyx_error_t registerCallback(unsigned port, Venc_1_0::EncoderCallback callback);
+    nyx_error_t registerCallback(unsigned port, stream::HardwareCallback callback);
     nyx_error_t copyData(unsigned port, uint8_t* destination, const uint8_t* source, unsigned size,
         const uint8_t* start, const uint8_t* end);
     nyx_error_t start(unsigned port);
@@ -107,32 +97,18 @@ using Plane = ::nyx::ScreenCapture_1_0::PlaneProperties;
 using VideoWindow = ::nyx::ScreenCapture_1_0::VideoWindowInfo;
 using Input = ::nyx::Vscaler_1_0::InputInfo;
 using ScalerCapability = ::nyx::Vscaler_1_0::DeviceCapability;
-using Frame = ::nyx::Venc_1_0::FrameInfo;
-enum class Parameter : uint8_t {
-    FrameRate = 0,
-    Width = 1,
-    Height = 2,
-    Bitrate = 7,
-    Profile = 8,
-    Level = 9,
-    Codec = 10,
-    Mode = 11,
-    GopLength = 12
-};
 using EncoderInput = ::nyx::Venc_1_0::InputType;
 using Window = ::nyx::Vscaler_1_0::WindowId;
 
 static_assert(sizeof(Plane) == 16 && sizeof(Input) == 8 && sizeof(VideoWindow) == 28);
 static_assert(sizeof(nyx_error_t) == 4);
-static_assert(sizeof(void*) == 4 && offsetof(Frame, bytes) == 20, "Nyx TV ABI requires ARM32");
+static_assert(
+    sizeof(void*) == 4 && offsetof(HardwareFrame, bytes) == 20, "Nyx TV ABI requires ARM32");
 
 constexpr uint32_t kFramebufferPlane = 3;
 constexpr uint32_t kFramebufferInput = 8;
 constexpr auto kEncoderOutput = static_cast<::nyx::Vscaler_1_0::OutputMode>(2);
 constexpr unsigned kScalerWindows = 4; // MAIN, SUB0, SUB1, SUB2 in Vscaler 1.0.
-constexpr auto kSuccess = static_cast<nyx_error_t>(0);
-constexpr auto kDeviceError = static_cast<nyx_error_t>(5);
-
 struct Api {
     ::nyx::VencProxy& encoder = ::nyx::getVenc();
     ::nyx::ScreenCaptureProxy& screen = ::nyx::getScreenCapture();

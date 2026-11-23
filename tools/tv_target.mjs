@@ -52,7 +52,8 @@ export async function verifyTvTarget(target, request = fetch) {
     throw new Error("The TV did not accept the configured credentials");
   }
   const status = await response.json();
-  if (status.application !== "org.webosbrew.jetkvm" || status.source !== "Nyx hardware H.264") {
+  const hardwareSources = ["Nyx hardware H.264", "LG hardware H.264"];
+  if (status.application !== "org.webosbrew.jetkvm" || !hardwareSources.includes(status.source)) {
     throw new Error("Integration tests require the webOS hardware backend");
   }
   if (status.streaming) {

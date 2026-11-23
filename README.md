@@ -5,8 +5,10 @@ Video uses hardware H.264 encoding and WebRTC, with keyboard, mouse, scrolling,
 paste, macros, and TV remote controls.
 
 Requires root access, Homebrew Channel, and compatible webOS capture interfaces.
-Compatibility depends on the TV firmware. One viewer can connect at a time;
-audio streaming is not supported.
+The server uses Nyx capture where the firmware exports the required interfaces.
+On LG O22 TVs such as the C2, it can also use the older LG hardware encoder and
+display feedback controls. One viewer can connect at a time. Audio streaming is
+not supported.
 
 ## Install and use
 

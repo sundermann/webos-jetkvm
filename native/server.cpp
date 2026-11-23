@@ -440,7 +440,7 @@ json Server::status() {
     const double cpu = static_cast<double>(usage.ru_utime.tv_sec) + usage.ru_utime.tv_usec / 1e6 +
                        static_cast<double>(usage.ru_stime.tv_sec) + usage.ru_stime.tv_usec / 1e6;
     const auto& video = streaming_ ? active_resolution_ : resolution_;
-    return {{"application", "org.webosbrew.jetkvm"}, {"source", "Nyx hardware H.264"},
+    return {{"application", "org.webosbrew.jetkvm"}, {"source", capture_->source()},
         {"streaming", static_cast<bool>(streaming_)}, {"resolution", resolution_.id},
         {"width", video.width}, {"height", video.height}, {"targetFps", video.fps},
         {"bitrateKbps", bitrate_}, {"captured", static_cast<uint64_t>(captured_)},

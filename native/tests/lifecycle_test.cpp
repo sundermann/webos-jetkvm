@@ -19,6 +19,8 @@ static_assert(!std::is_constructible_v<stream::Cursor, bool>);
 static_assert(
     std::is_same_v<decltype(&stream::make_capture), std::unique_ptr<stream::Capture> (*)()>);
 using namespace std::chrono_literals;
+void capture_backend_regressions(const char* module);
+
 namespace {
 void require(bool value, const char* message) {
     if (!value) {
@@ -113,11 +115,14 @@ void partial_acquisition() {
     require(resource.closed == 2, "Registered handle was not released exactly once");
 }
 } // namespace
-int main() try {
+int main(int argc, char** argv) try {
+    require(argc == 2, "Expected a capture module path");
     bridge_lifetime();
     descriptor_ownership();
     partial_acquisition();
-    std::cout << "Passed: callback lifetime, descriptor ownership and partial acquisition\n";
+    capture_backend_regressions(argv[1]);
+    std::cout << "Passed: callback lifetime, descriptor ownership, partial acquisition and capture "
+                 "backend\n";
     return 0;
 } catch (const std::exception& error) {
     std::cerr << error.what() << '\n';

@@ -5,6 +5,7 @@
 #include <cstdint>
 #include <functional>
 #include <memory>
+#include <string_view>
 
 namespace stream {
 using FrameCallback = std::function<void(Bytes, uint32_t)>;
@@ -20,6 +21,7 @@ class Capture {
         const Resolution& resolution = kResolutions.back()) = 0;
     virtual void keyframe() = 0;
     virtual void stop() noexcept = 0;
+    [[nodiscard]] virtual std::string_view source() const noexcept = 0;
 };
 [[nodiscard]] std::unique_ptr<Capture> make_capture();
 } // namespace stream

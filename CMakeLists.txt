@@ -71,6 +71,7 @@ if(CMAKE_CROSSCOMPILING)
         native/main.cpp
         native/server.cpp
         native/capture.cpp
+        native/capture_lg.cpp
         native/input.cpp
         native/webos_input.cpp
         native/cursor.cpp
@@ -89,7 +90,12 @@ if(CMAKE_CROSSCOMPILING)
     target_compile_definitions(webos-jetkvm PRIVATE CPPHTTPLIB_WEBSOCKET_CLOSE_TIMEOUT_SECOND=1)
     target_link_libraries(
         webos-jetkvm
-        PRIVATE LibDataChannel::LibDataChannelStatic OpenSSL::SSL OpenSSL::Crypto Threads::Threads
+        PRIVATE
+            LibDataChannel::LibDataChannelStatic
+            OpenSSL::SSL
+            OpenSSL::Crypto
+            Threads::Threads
+            ${CMAKE_DL_LIBS}
     )
     set_target_properties(
         webos-jetkvm
@@ -100,7 +106,7 @@ if(CMAKE_CROSSCOMPILING)
     )
 
     add_subdirectory(native/stubs)
-    target_link_libraries(webos-jetkvm PRIVATE webos_nyx webos_im)
+    target_link_libraries(webos-jetkvm PRIVATE webos_im)
     target_link_libraries(webos-jetkvm PRIVATE atomic rt)
     find_library(WAYLAND_CLIENT_LIBRARY NAMES wayland-client REQUIRED)
     find_library(WAYLAND_WEBOS_LIBRARY NAMES wayland-webos-client REQUIRED)
@@ -118,6 +124,18 @@ if(CMAKE_CROSSCOMPILING)
     find_library(GLIB_LIBRARY NAMES glib-2.0 REQUIRED)
     find_library(LS2_LIBRARY NAMES luna-service2 REQUIRED)
     find_library(PBNJSON_LIBRARY NAMES pbnjson_cpp REQUIRED)
+    # Keep the optional firmware ABI out of the server's dynamic dependencies.
+    add_library(webos-jetkvm-nyx SHARED native/capture_nyx.cpp)
+    target_compile_options(webos-jetkvm-nyx PRIVATE -Wall -Wextra -Wpedantic)
+    target_link_libraries(webos-jetkvm-nyx PRIVATE webos_nyx "${PBNJSON_LIBRARY}")
+    set_target_properties(
+        webos-jetkvm-nyx
+        PROPERTIES
+            LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/service/lib"
+            BUILD_WITH_INSTALL_RPATH ON
+            INSTALL_RPATH "$ORIGIN"
+    )
+    add_dependencies(webos-jetkvm webos-jetkvm-nyx)
     # Keep the SDK immutable. A reviewed source overlay replaces GLib's GNU-only
     # C++ boolean expression with a lambda while retaining assignment diagnostics.
     set(WEBOS_GLIB_HEADERS "${CMAKE_BINARY_DIR}/sdk-include")
@@ -133,13 +151,16 @@ if(CMAKE_CROSSCOMPILING)
         webos-jetkvm
         PRIVATE "${WEBOS_GLIB_HEADERS}" "${GLIB_INCLUDE_DIR}" "${GLIB_CONFIG_DIR}"
     )
+    target_include_directories(
+        webos-jetkvm-nyx
+        PRIVATE "${WEBOS_GLIB_HEADERS}" "${GLIB_INCLUDE_DIR}" "${GLIB_CONFIG_DIR}"
+    )
     add_library(glib-boolean-check OBJECT native/tests/glib_boolean_test.cpp)
     target_include_directories(
         glib-boolean-check
         PRIVATE "${WEBOS_GLIB_HEADERS}" "${GLIB_INCLUDE_DIR}" "${GLIB_CONFIG_DIR}"
     )
     target_compile_options(glib-boolean-check PRIVATE -Wall -Wextra -Wpedantic)
-    target_link_libraries(webos-jetkvm PRIVATE "${PBNJSON_LIBRARY}")
     add_executable(webos-jetkvm-service service/main.cpp service/control.cpp native/settings.cpp)
     add_dependencies(webos-jetkvm-service glib-boolean-check)
     target_include_directories(
@@ -248,10 +269,18 @@ if(BUILD_TESTING AND NOT CMAKE_CROSSCOMPILING)
     )
     target_link_libraries(jetkvm-test PRIVATE Threads::Threads)
     add_test(NAME jetkvm-protocol COMMAND jetkvm-test)
-    add_executable(lifecycle-test native/tests/lifecycle_test.cpp)
+    add_library(capture-backend-fixture MODULE native/tests/capture_backend_fixture.cpp)
+    target_include_directories(capture-backend-fixture PRIVATE native)
+    add_executable(
+        lifecycle-test
+        native/tests/lifecycle_test.cpp
+        native/tests/capture_test.cpp
+        native/capture.cpp
+    )
+    add_dependencies(lifecycle-test capture-backend-fixture)
     target_include_directories(lifecycle-test PRIVATE native)
-    target_link_libraries(lifecycle-test PRIVATE Threads::Threads)
-    add_test(NAME lifecycle COMMAND lifecycle-test)
+    target_link_libraries(lifecycle-test PRIVATE Threads::Threads ${CMAKE_DL_LIBS})
+    add_test(NAME lifecycle COMMAND lifecycle-test "$<TARGET_FILE:capture-backend-fixture>")
     add_executable(
         control-test
         native/tests/control_test.cpp

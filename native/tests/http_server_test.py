@@ -168,7 +168,7 @@ def main():
             with urllib.request.urlopen(request(endpoint, auth), timeout=1) as response:
                 status = json.load(response)
             assert status["application"] == "org.webosbrew.jetkvm"
-            assert status["source"] == "Nyx hardware H.264"
+            assert status["source"] in ("Nyx hardware H.264", "LG hardware H.264")
             duplicate = tv.run("--config", config, "--port", str(port))
             assert duplicate.returncode != 0, "Second server shared the HTTP port"
             assert "Cannot bind HTTP port" in duplicate.stderr

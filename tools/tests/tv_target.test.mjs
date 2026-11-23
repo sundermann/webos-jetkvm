@@ -44,6 +44,14 @@ test("integration tests require a hardware server without an existing viewer", a
       streaming: false,
     }),
   );
+  await verifyTvTarget(
+    target,
+    response({
+      application: "org.webosbrew.jetkvm",
+      source: "LG hardware H.264",
+      streaming: false,
+    }),
+  );
   await assert.rejects(verifyTvTarget(target, response({ application: "other" })), /webOS/);
   await assert.rejects(
     verifyTvTarget(
