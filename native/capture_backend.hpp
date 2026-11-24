@@ -12,7 +12,7 @@
 enum nyx_error_t : int32_t;
 
 namespace nyx::Venc_1_0 {
-// Prefix shared by the Nyx and O22 HAL hardware encoder callbacks.
+// Prefix shared by the Nyx, LG and Realtek hardware encoder callbacks.
 struct FrameInfo {
     uint32_t port{};
     uint8_t type = 0;
@@ -69,8 +69,8 @@ struct CaptureBackend {
     std::function<std::unique_ptr<CaptureHardware>()> open;
 };
 
-[[nodiscard]] CaptureBackend select_capture_backend(
-    const char* nyx_module, CaptureBackend (*legacy_backend)());
+[[nodiscard]] CaptureBackend select_capture_backend(const char* nyx_module,
+    CaptureBackend (*legacy_backend)(), CaptureBackend (*realtek_backend)());
 [[nodiscard]] std::unique_ptr<Capture> make_hardware_capture(
     CaptureBackend backend, const char* lock_path = "/tmp/webos-venc.lock");
 } // namespace stream

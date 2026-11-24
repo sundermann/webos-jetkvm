@@ -1,4 +1,5 @@
 #include "capture_backend.hpp"
+#include "capture_realtek.hpp"
 #include "dynamic_library.hpp"
 #include "file.hpp"
 
@@ -246,6 +247,7 @@ CaptureBackend load_lg_backend() {
 } // namespace
 
 std::unique_ptr<Capture> make_capture() {
-    return make_hardware_capture(select_capture_backend("libwebos-jetkvm-nyx.so", load_lg_backend));
+    return make_hardware_capture(
+        select_capture_backend("libwebos-jetkvm-nyx.so", load_lg_backend, load_realtek_backend));
 }
 } // namespace stream

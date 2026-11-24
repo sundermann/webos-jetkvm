@@ -7,7 +7,8 @@ paste, macros, and TV remote controls.
 Requires root access, Homebrew Channel, and compatible webOS capture interfaces.
 The server uses Nyx capture where the firmware exports the required interfaces.
 On LG O22 TVs such as the C2, it can also use the older LG hardware encoder and
-display feedback controls. One viewer can connect at a time. Audio streaming is
+display feedback controls. Firmware with the Realtek scaler encoder can use it
+for direct H.264 capture. One viewer can connect at a time. Audio streaming is
 not supported.
 
 ## Install and use
@@ -19,6 +20,8 @@ not supported.
 
 The TV app controls resolution, start/stop, and autostart. Available video presets
 are 360p, 540p, 720p, and 1080p; the default is 1920 × 1080 at 30 fps.
+The Realtek HAL can keep the scaler input dimensions when a different resolution
+is requested.
 
 For mouse control, turn **Audio Guidance** off in the TV’s accessibility settings.
 Right-click and Escape act as **Back**. Keyboard layout and macros are saved on

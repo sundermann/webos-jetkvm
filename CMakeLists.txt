@@ -72,6 +72,7 @@ if(CMAKE_CROSSCOMPILING)
         native/server.cpp
         native/capture.cpp
         native/capture_lg.cpp
+        native/capture_realtek.cpp
         native/input.cpp
         native/webos_input.cpp
         native/cursor.cpp
@@ -276,6 +277,7 @@ if(BUILD_TESTING AND NOT CMAKE_CROSSCOMPILING)
         native/tests/lifecycle_test.cpp
         native/tests/capture_test.cpp
         native/capture.cpp
+        native/capture_realtek.cpp
     )
     add_dependencies(lifecycle-test capture-backend-fixture)
     target_include_directories(lifecycle-test PRIVATE native)

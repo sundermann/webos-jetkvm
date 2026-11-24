@@ -123,15 +123,21 @@ CaptureBackend load_nyx(const char* module) {
 }
 } // namespace
 
-CaptureBackend select_capture_backend(const char* nyx_module, CaptureBackend (*legacy_backend)()) {
+CaptureBackend select_capture_backend(const char* nyx_module, CaptureBackend (*legacy_backend)(),
+    CaptureBackend (*realtek_backend)()) {
     try {
         return load_nyx(nyx_module);
     } catch (const std::runtime_error& nyx_error) {
         try {
             return legacy_backend();
         } catch (const std::runtime_error& legacy_error) {
-            throw std::runtime_error(std::string("No working hardware capture backend. Nyx: ") +
-                                     nyx_error.what() + "; LG encoder: " + legacy_error.what());
+            try {
+                return realtek_backend();
+            } catch (const std::runtime_error& realtek_error) {
+                throw std::runtime_error(std::string("No working hardware capture backend. Nyx: ") +
+                                         nyx_error.what() + "; LG encoder: " + legacy_error.what() +
+                                         "; Realtek encoder: " + realtek_error.what());
+            }
         }
     }
 }
